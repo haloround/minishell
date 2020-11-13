@@ -10,12 +10,14 @@
 
 #define BUILTIN_COMMANDS 5
 
+//PWD用来存储当前工作路径
+//PATH用来存储commands文件夹路径以便执行
 char PWD[1024];
 char PATH[1024];
 
-//
+//将cd exit help pwd echo存入数组，作为内置函数使用
 char * Built_in[] = {"cd", "exit", "help", "pwd", "echo"};
-
+//内置cd命令
 int Built_in_cd(char ** args)
 {
   if(args[1] == NULL)
@@ -29,12 +31,12 @@ int Built_in_cd(char ** args)
   getcwd(PWD, sizeof(PWD));
   return 1;
 }
-
+//内置exit命令
 int Built_in_exit(char ** args)
 {
   return 0;
 }
-
+//内置help命令
 int Built_in_help(char ** args)
 {
   printf("\n                minishell                \n");
@@ -63,13 +65,13 @@ int Built_in_help(char ** args)
   printf("\n\t* Example: ls -i >> outfile 2> error_file\n");
   return 1;
 }
-
+//内置pwd命令
 int Built_in_pwd(char ** args)
 {
   printf("%s\n", PWD);
   return 1;
 }
-
+//内置echo命令
 int Built_in_echo(char ** args)
 {
   int i = 1;
@@ -84,7 +86,7 @@ int Built_in_echo(char ** args)
   }
   printf("\n");
 }
-
+//存储内置命令指针
 int (* Built_in_function[]) (char **) = 
 {
   &Built_in_cd,
@@ -93,7 +95,7 @@ int (* Built_in_function[]) (char **) =
   &Built_in_pwd,
   &Built_in_echo,
 };
-
+//输入处理，用空格进行分割
 char ** Command_split_line(char * command)
 {
   int position = 0;
@@ -111,7 +113,7 @@ char ** Command_split_line(char * command)
   tokens[position] = NULL;
   return tokens;
 }
-
+//读取命令
 char * Command_read_line(void)
 {
   int position = 0;
@@ -135,7 +137,7 @@ char * Command_read_line(void)
   }
   return command;
 }
-
+//创建进程，fork系统调用，execv进行管理进程
 int process_start(char ** args)
 {
   int status;
@@ -148,7 +150,7 @@ int process_start(char ** args)
     char command_dir[1024];
     strcpy(command_dir, PATH);
     strcat(command_dir, args[0]);
-
+//将PATH路径与输入的参数合并，系统再来调用这个路径下的command
     if(execv(command_dir, args) == -1)
     {
       perror("minishell");
@@ -171,7 +173,7 @@ int process_start(char ** args)
   
   return 1;
 }
-
+//输入输出错误重定向
 int shell_execute(char ** args)
 {
   if(args[0] == NULL)
@@ -332,6 +334,7 @@ int shell_execute(char ** args)
   dup2(std_err, 2);
   return ret_status;
 }
+//循环读取，调用command_split_line和command_split_line
 void loop(void)
 {
   int status = Built_in_help(NULL);
