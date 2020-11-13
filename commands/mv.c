@@ -10,20 +10,14 @@ int main(int argc, char ** argv){
 		fprintf(stderr, "minsh: Not enough arguments\n");
 		return 1;
 	}
-
-	// Try opening the last argument to see if it is a directory or a file
 	struct stat dirstat;
 	if (stat(argv[argc-1], &dirstat) < 0 || ! (S_ISDIR(dirstat.st_mode))){	
-		
-		// If the specified directory doesn't exist, it must be a file
-		// Or if it is a file that already exists, overwrite
 
-		if ( argc > 3 ){	// Only source file and destination file must be the arguments
+		if ( argc > 3 ){
 			fprintf(stderr, "minsh: Too many arguments\n");
 			return 1;
 		}
 		
-		// Copy source file into destination file
 		int fd_src, fd_dest;
 		char buffer[1024];
 		int nbytes;
@@ -44,13 +38,13 @@ int main(int argc, char ** argv){
 
 		nbytes = read(fd_src, buffer, 1024);
 		while (1){
-			if ( nbytes < 0 ){	// Error has occurred
+			if ( nbytes < 0 ){
 				perror("minsh");
 				close(fd_src);
 				close(fd_dest);
 				return 1;
 			}
-			else if ( nbytes == 0 ){	// End of file
+			else if ( nbytes == 0 ){
 				break;
 			}
 			else{
@@ -61,7 +55,7 @@ int main(int argc, char ** argv){
 		close(fd_src);
 		close(fd_dest);
 		
-		// Delete the source file
+
 		if ( unlink(argv[1]) < 0 ){
 			perror("minsh");
 			return 1; 
@@ -70,7 +64,6 @@ int main(int argc, char ** argv){
 		return 0;
 	}
 
-	// If execution reaches this point, a directory is the last argument, so open and write to the necessary files
 	int i = 1;
 	int fd_src, fd_dest;
 	char buffer[1024];
@@ -84,8 +77,7 @@ int main(int argc, char ** argv){
 			perror("minsh");
 			return 1;
 		}
-		
-		// Find the path to the destination file
+
 		strcpy(dest, argv[argc-1]);
 		strcat(dest, "/");
 		strcat(dest, argv[i]);
@@ -99,13 +91,13 @@ int main(int argc, char ** argv){
 
 		nbytes = read(fd_src, buffer, 1024);
 		while (1){
-			if ( nbytes < 0 ){	// Error has occurred
+			if ( nbytes < 0 ){
 				perror("minsh");
 				close(fd_src);
 				close(fd_dest);
 				return 1;
 			}
-			else if ( nbytes == 0 ){	// End of file
+			else if ( nbytes == 0 ){
 				break;
 			}
 			else{
@@ -116,7 +108,6 @@ int main(int argc, char ** argv){
 		close(fd_src);
 		close(fd_dest);
 
-		// Delete the source file
 		if ( unlink(argv[i]) < 0 ){
 			perror("minsh");
 			return 1; 
